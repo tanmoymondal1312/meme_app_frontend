@@ -13,7 +13,8 @@ class _MainScreenState extends State<MainScreen> {
   String imgname = "";
   String imgurl = "";
   int? memeNo;
-  bool is_loading = true;
+  bool isLoading = true;
+  int target_meme = 200;
 
   @override
   void initState() {
@@ -24,17 +25,29 @@ class _MainScreenState extends State<MainScreen> {
 
   Future<void> GetInitMemeNo() async {
     memeNo = await SaveMyData.fetchData() ?? 0;
+    if(memeNo! >=200){
+      target_meme = 300;
+    }
+    if(memeNo! >=300){
+      target_meme = 500;
+    }
     setState(() {});
   }
 
-
   Future<void> UpdateImage() async {
+    setState(() {
+      isLoading = true; // Start loading
+    });
     var newmeme = await FetchMeme.fetchNewMeme();
     if (newmeme != null) {
       setState(() {
         imgurl = newmeme["imageUrl"] ?? "";
         imgname = newmeme["memeName"] ?? "";
-        is_loading = false;
+        isLoading = false; // End loading
+      });
+    } else {
+      setState(() {
+        isLoading = false; // End loading even if there is no new meme
       });
     }
   }
@@ -57,26 +70,30 @@ class _MainScreenState extends State<MainScreen> {
             const SizedBox(
               height: 1,
             ),
-            const Text(
-              "TARGET 500 MEMES",
+             Text(
+              'TARGET: ${target_meme} MEME',
               style: TextStyle(fontSize: 18, color: Color(0xFFC371FF)),
+            ),
+            const SizedBox(
+              height: 30,
             ),
             SizedBox(
               width: 400,
               height: 400,
-              child: is_loading
+              child: isLoading
                   ? const Center(
-                child: CircularProgressIndicator(), // Loading animation
+                child: CircularProgressIndicator(), // Show loading indicator
               )
-                  : imgurl.isNotEmpty
-                  ? Image.network(
+                  : Image.network(
                 imgurl,
                 fit: BoxFit.contain,
-              )
-                  : const Center(child: Text("No Image Available")),
-            ),
-            const SizedBox(
-              height: 30,
+                loadingBuilder: (context, child, loadingProgress) {
+                  if (loadingProgress == null) return child;
+                  return const Center(
+                    child: CircularProgressIndicator(), // Show loading indicator while image loads
+                  );
+                },
+              ),
             ),
             ElevatedButton(
               onPressed: () async {
@@ -89,7 +106,7 @@ class _MainScreenState extends State<MainScreen> {
                   bool isSaved = await SaveMyData.saveData(newMemeNo);
 
                   await GetInitMemeNo(); // Ensure this is awaited
-                  }
+                }
               },
               child: const SizedBox(
                 height: 50,
@@ -101,7 +118,7 @@ class _MainScreenState extends State<MainScreen> {
                   ),
                 ),
               ),
-            ), // Added comma here
+            ),
             const Spacer(),
             const Text("APP CREATED BY"),
             const Text(

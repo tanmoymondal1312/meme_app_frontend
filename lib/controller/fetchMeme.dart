@@ -5,7 +5,7 @@ class FetchMeme {
   static Future<Map<String, String>?> fetchNewMeme() async {
     try {
       // Send the HTTP GET request
-      Response response = await get(Uri.parse("http://192.168.0.105:8000/memes/api/image-urls/"));
+      Response response = await get(Uri.parse("https://meme1-backend.onrender.com/memes/api/image-urls/"));
       print('HTTP Response Status Code: ${response.statusCode}');  // Print the HTTP status code
       print('HTTP Response Body: ${response.body}');  // Print the raw response body
 
