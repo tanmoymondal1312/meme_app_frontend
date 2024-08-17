@@ -19,7 +19,7 @@ class _MainScreenState extends State<MainScreen> {
   @override
   void initState() {
     super.initState();
-    UpdateImage(); // Load initial meme when the screen is initialized
+    UpdateImage();
     GetInitMemeNo();
   }
 
@@ -36,18 +36,18 @@ class _MainScreenState extends State<MainScreen> {
 
   Future<void> UpdateImage() async {
     setState(() {
-      isLoading = true; // Start loading
+      isLoading = true;
     });
     var newmeme = await FetchMeme.fetchNewMeme();
     if (newmeme != null) {
       setState(() {
         imgurl = newmeme["imageUrl"] ?? "";
         imgname = newmeme["memeName"] ?? "";
-        isLoading = false; // End loading
+        isLoading = false;
       });
     } else {
       setState(() {
-        isLoading = false; // End loading even if there is no new meme
+        isLoading = false;
       });
     }
   }
@@ -76,13 +76,18 @@ class _MainScreenState extends State<MainScreen> {
             ),
             const SizedBox(
               height: 30,
+
             ),
+            Text(
+                imgname,
+                style: TextStyle(fontSize: 23, color: Color(0xFFEFD807)),
+             ),
             SizedBox(
               width: 400,
               height: 400,
               child: isLoading
                   ? const Center(
-                child: CircularProgressIndicator(), // Show loading indicator
+                child: CircularProgressIndicator(),
               )
                   : Image.network(
                 imgurl,
@@ -90,14 +95,14 @@ class _MainScreenState extends State<MainScreen> {
                 loadingBuilder: (context, child, loadingProgress) {
                   if (loadingProgress == null) return child;
                   return const Center(
-                    child: CircularProgressIndicator(), // Show loading indicator while image loads
+                    child: CircularProgressIndicator(),
                   );
                 },
               ),
             ),
             ElevatedButton(
               onPressed: () async {
-                await UpdateImage(); // Ensure UpdateImage completes before proceeding
+                await UpdateImage();
                 if (memeNo != null) {
                   print("Current memeNo: $memeNo");
 
@@ -105,7 +110,7 @@ class _MainScreenState extends State<MainScreen> {
                   int newMemeNo = memeNo! + 1;
                   bool isSaved = await SaveMyData.saveData(newMemeNo);
 
-                  await GetInitMemeNo(); // Ensure this is awaited
+                  await GetInitMemeNo();
                 }
               },
               child: const SizedBox(
